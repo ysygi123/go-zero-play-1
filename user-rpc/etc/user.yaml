@@ -1,0 +1,12 @@
+Name: user.rpc
+ListenOn: 127.0.0.1:8081
+Etcd:
+  Hosts:
+  - 127.0.0.1:2379
+  Key: user.rpc
+Mysql:
+  MasterHost: "root:1qazxsw2@tcp(127.0.0.1:3306)/scrm?charset=utf8mb4&parseTime=True&loc=Local&timeout=1000ms"
+  SlaveHosts:
+    - "root:1qazxsw2@tcp(127.0.0.1:3306)/scrm?charset=utf8mb4&parseTime=True&loc=Local&timeout=1000ms"
+    - "root:1qazxsw2@tcp(127.0.0.1:3306)/scrm?charset=utf8mb4&parseTime=True&loc=Local&timeout=1000ms"
+

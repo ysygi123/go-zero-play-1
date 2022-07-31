@@ -1,0 +1,28 @@
+type (
+	UserReq {
+		Id string `path:"id"`
+	}
+
+	UserReply {
+		Id   string `json:"id"`
+		Name string `json:"name"`
+	}
+
+	JwtReply {
+		Token  string `json:"token"`
+		Expire int64  `json:"expire"`
+	}
+)
+@server(
+	jwt: Auth
+	middleware: TestMiddleware1
+)
+service user {
+	@handler getUser
+	get /api/user/get/:id (UserReq) returns (UserReply)
+}
+
+service user {
+	@handler getJWT
+	get /api/user/jwt returns (JwtReply)
+}

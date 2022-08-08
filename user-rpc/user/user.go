@@ -32,7 +32,6 @@ func NewUser(cli zrpc.Client) User {
 }
 
 func (m *defaultUser) GetUser(ctx context.Context, in *IdRequest, opts ...grpc.CallOption) (*UserResponse, error) {
-	grpcClient := m.cli.Conn()
-	client := user.NewUserClient(grpcClient)
+	client := user.NewUserClient(m.cli.Conn())
 	return client.GetUser(ctx, in, opts...)
 }

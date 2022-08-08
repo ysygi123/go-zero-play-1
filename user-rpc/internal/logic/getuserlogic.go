@@ -2,7 +2,7 @@ package logic
 
 import (
 	"context"
-
+	user_model "go-zero-play-1/model/mysql/user-model"
 	"go-zero-play-1/user-rpc/internal/svc"
 	"go-zero-play-1/user-rpc/types/user"
 
@@ -24,11 +24,17 @@ func NewGetUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetUserLo
 }
 
 func (l *GetUserLogic) GetUser(in *user.IdRequest) (*user.UserResponse, error) {
-	// todo: add your logic here and delete this line
-
+	userData, err := user_model.ScCorpUserModel.GetUser(l.ctx, int(in.Id))
+	if err != nil {
+		return nil, err
+	}
+	g := "难"
+	if userData.Gender == 1 {
+		g = "女"
+	}
 	return &user.UserResponse{
-		Id:     "111",
-		Name:   "11111",
-		Gender: "11",
+		Id:     in.GetId(),
+		Name:   userData.Name,
+		Gender: g,
 	}, nil
 }

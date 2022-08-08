@@ -2,6 +2,7 @@ package symysql
 
 import (
 	"context"
+	"errors"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/zeromicro/go-zero/core/logx"
 	"gorm.io/driver/mysql"
@@ -15,7 +16,9 @@ var db *gorm.DB
 
 func InitSyMysql(master string, slave []string) (err error) {
 	db, err = gorm.Open(mysql.Open(master), &gorm.Config{
-		Logger: &syMysqlLogger{},
+		Logger: &syMysqlLogger{
+			LogLevel: logger.Info,
+		},
 	})
 	if err != nil {
 		return
@@ -50,12 +53,12 @@ func GetDbSession(ctx context.Context) *gorm.DB {
 }
 
 type syMysqlLogger struct {
-	//LogLevel logger.LogLevel
+	LogLevel logger.LogLevel
 }
 
 func (s *syMysqlLogger) LogMode(level logger.LogLevel) logger.Interface {
 	newlogger := *s
-	//newlogger.LogLevel = level
+	newlogger.LogLevel = level
 	return &newlogger
 }
 func (s *syMysqlLogger) Info(ctx context.Context, msg string, params ...interface{}) {
@@ -68,5 +71,11 @@ func (s *syMysqlLogger) Error(ctx context.Context, msg string, params ...interfa
 	logx.WithContext(ctx).Errorw(msg)
 }
 func (s *syMysqlLogger) Trace(ctx context.Context, begin time.Time, fc func() (string, int64), err error) {
-
+	elapsed := time.Since(begin)
+	if err != nil && !errors.Is(err, logger.ErrRecordNotFound) {
+		logx.WithContext(ctx).Errorw("sql err : ", logx.Field("err", err))
+		return
+	}
+	sql, rowsAffect := fc()
+	logx.WithContext(ctx).Infow("sql Info", logx.Field("sql str", sql), logx.Field("rows affect", rowsAffect), logx.Field("the time", elapsed))
 }

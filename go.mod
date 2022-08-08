@@ -3,6 +3,7 @@ module go-zero-play-1
 go 1.16
 
 require (
+	github.com/Shopify/sarama v1.35.0 // indirect
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/zeromicro/go-zero v1.3.5

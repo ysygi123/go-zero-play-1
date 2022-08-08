@@ -2,11 +2,11 @@
 package types
 
 type UserReq struct {
-	Id string `path:"id"`
+	Id int `path:"id"`
 }
 
 type UserReply struct {
-	Id   string `json:"id"`
+	Id   int    `json:"id"`
 	Name string `json:"name"`
 }
 

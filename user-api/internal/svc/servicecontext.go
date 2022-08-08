@@ -9,16 +9,16 @@ import (
 )
 
 type ServiceContext struct {
-	Config      config.Config
-	UserRpc     user.User
-	TestMiddle1 rest.Middleware
+	Config          config.Config
+	UserRpc         user.User
+	TestMiddleware1 rest.Middleware
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
 
 	return &ServiceContext{
-		Config:      c,
-		UserRpc:     user.NewUser(zrpc.MustNewClient(c.UserRpc)),
-		TestMiddle1: middleware.NewTestMiddleware1Middleware().Handle,
+		Config:          c,
+		UserRpc:         user.NewUser(zrpc.MustNewClient(c.UserRpc)),
+		TestMiddleware1: middleware.NewTestMiddleware1Middleware().Handle,
 	}
 }

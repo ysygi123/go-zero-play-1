@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"go-zero-play-1/common/symysql"
-
 	"go-zero-play-1/user-rpc/internal/config"
 	"go-zero-play-1/user-rpc/internal/server"
 	"go-zero-play-1/user-rpc/internal/svc"

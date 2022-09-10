@@ -4,8 +4,12 @@ import (
 	"context"
 	"fmt"
 	"github.com/Shopify/sarama"
+	"github.com/zeromicro/go-zero/core/stores/cache"
+	"github.com/zeromicro/go-zero/core/stores/redis"
 	"go-zero-play-1/common/symysql"
+	"go-zero-play-1/common/syredis"
 	user_model "go-zero-play-1/model/mysql/user-model"
+	"strconv"
 	"sync"
 	"testing"
 	"time"
@@ -38,6 +42,7 @@ func TestProduceKafka(t *testing.T) {
 	config.Producer.RequiredAcks = sarama.WaitForAll          //follow同步数据后返回
 	config.Producer.Partitioner = sarama.NewRandomPartitioner //随机分配分区 partition
 	config.Producer.Return.Successes = true
+	config.Producer.Interceptors = []sarama.ProducerInterceptor{}
 	//当出现消息失败的时候 需要看是 dail fail 哪个名称失败了，然后mac是去 /etc/hosts 里面加上 ip 域名 这样就可以了
 	client, err := sarama.NewSyncProducer([]string{"192.168.3.36:9092"}, config)
 	if err != nil {
@@ -89,4 +94,66 @@ func TestConsumeKafka(t *testing.T) {
 	}
 	fmt.Println("直接睡觉了？？离谱吧")
 	time.Sleep(100 * time.Second)
+}
+
+func Test_Redis(t *testing.T) {
+	cf := cache.CacheConf{}
+	cf = append(cf, cache.NodeConf{
+		RedisConf: redis.RedisConf{
+			Host: "127.0.0.1:6380",
+			Type: "cluster",
+			Pass: "",
+			Tls:  false,
+		},
+		Weight: 100,
+	})
+	cf = append(cf, cache.NodeConf{
+		RedisConf: redis.RedisConf{
+			Host: "127.0.0.1:6381",
+			Type: "cluster",
+			Pass: "",
+			Tls:  false,
+		},
+		Weight: 100,
+	})
+	cf = append(cf, cache.NodeConf{
+		RedisConf: redis.RedisConf{
+			Host: "127.0.0.1:6382",
+			Type: "cluster",
+			Pass: "",
+			Tls:  false,
+		},
+		Weight: 100,
+	})
+	syredis.InitSyRedis(cf)
+	var err error
+	for i := int64(5000000); i < 100000000; i++ {
+		_, err = syredis.GsyRedis.Zadd("test:big:range", i, strconv.Itoa(int(i)))
+		if err != nil {
+			fmt.Println(err)
+		}
+		tt := time.Now()
+		if i%10000 == 0 {
+			fmt.Println("执行了次数", i, "执行时间", time.Since(tt))
+		}
+	}
+}
+
+func Test_Select(t *testing.T) {
+	output := make(chan string, 1)
+	ttimer := time.Tick(time.Second)
+	go func() {
+		for {
+			select {
+			case output <- "你好":
+				time.Sleep(time.Second)
+			case <-ttimer:
+				fmt.Println("接收定时器哦")
+			}
+		}
+	}()
+
+	for x := range output {
+		fmt.Println(x)
+	}
 }

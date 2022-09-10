@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"go-zero-play-1/common/symysql"
+	"go-zero-play-1/common/syredis"
 	"go-zero-play-1/user-rpc/internal/config"
 	"go-zero-play-1/user-rpc/internal/server"
 	"go-zero-play-1/user-rpc/internal/svc"
@@ -38,6 +39,7 @@ func main() {
 		fmt.Println("初始化 数据库 失败 ...", err)
 		return
 	}
+	syredis.InitSyRedis(c.Cache)
 	defer s.Stop()
 
 	fmt.Printf("Starting rpc server at %s...\n", c.ListenOn)

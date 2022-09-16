@@ -62,6 +62,10 @@ func TestProduceKafka(t *testing.T) {
 	}
 	partition, offset, err := client.SendMessage(msg)
 	fmt.Println("查看发送情况", partition, offset, err)
+
+	clientV2, err := sarama.NewAsyncProducer([]string{"192.168.3.36:9092"}, config)
+	clientV2.Errors()
+	clientV2.Input()
 }
 
 func TestConsumeKafka(t *testing.T) {

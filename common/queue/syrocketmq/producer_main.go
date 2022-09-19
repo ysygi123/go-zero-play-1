@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 	jsoniter "github.com/json-iterator/go"
+	"go-zero-play-1/common/queue/syrocketmq/rocketmq_data"
+	"go-zero-play-1/common/queue/syrocketmq/rocketmq_i"
 	"math/rand"
 	"strconv"
-	"testplay/model/rocketmq"
-	"testplay/mq/rocketmq_i"
-	_ "testplay/mq/rocketmq_service/producer"
+
 	"time"
 )
 
@@ -23,7 +23,7 @@ func sendDefaultMessage() {
 		tagID := uint8(rand.Intn(1) + 1)
 		reg := "这是一个奇怪的东西-" + strconv.Itoa(i) + " : tagID = " + strconv.Itoa(int(tagID))
 		fmt.Println(reg)
-		newRm := &rocketmq.RMyMessage{
+		newRm := &rocketmq_data.RMyMessage{
 			TagID:   tagID,
 			Type:    1,
 			UID:     12,
@@ -45,7 +45,7 @@ func sendTransactionMessage() {
 		tagID := uint8(rand.Intn(1) + 1)
 		reg := "这是一个奇怪的东西-" + strconv.Itoa(i) + " : tagID = " + strconv.Itoa(int(tagID))
 		fmt.Println(reg)
-		newRm := &rocketmq.RMyMessage{
+		newRm := &rocketmq_data.RMyMessage{
 			TagID:   tagID,
 			Type:    1,
 			UID:     12,

@@ -7,9 +7,9 @@ import (
 	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"github.com/apache/rocketmq-client-go/v2/producer"
 	jsoniter "github.com/json-iterator/go"
+	"go-zero-play-1/common/queue/syrocketmq/rocketmq_data"
+	"go-zero-play-1/common/queue/syrocketmq/rocketmq_i"
 	"strconv"
-	rocketmq2 "testplay/model/rocketmq"
-	"testplay/mq/rocketmq_i"
 )
 
 func init() {
@@ -30,7 +30,7 @@ func (t *T1Producer) GetMessageSelector() producer.QueueSelector {
 }
 
 func (t *T1Producer) HandleMessage(message *primitive.Message, body []byte) (err error) {
-	RmsgT1 := new(rocketmq2.RMyMessage)
+	RmsgT1 := new(rocketmq_data.RMyMessage)
 	err = jsoniter.Unmarshal(body, RmsgT1)
 	if err != nil {
 		return

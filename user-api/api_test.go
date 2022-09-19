@@ -6,6 +6,7 @@ import (
 	"github.com/Shopify/sarama"
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/redis"
+	"go-zero-play-1/common/queue/sykafka/sykafka_service/service"
 	"go-zero-play-1/common/symysql"
 	"go-zero-play-1/common/syredis"
 	user_model "go-zero-play-1/model/mysql/user-model"
@@ -160,4 +161,30 @@ func Test_Select(t *testing.T) {
 	for x := range output {
 		fmt.Println(x)
 	}
+}
+
+func TestNewKafkaProducer(t *testing.T) {
+	fsq := new(service.Fsp)
+	err := fsq.InitProducer()
+	if err != nil {
+		fmt.Println(err, 1)
+		return
+	}
+	message := &sarama.ProducerMessage{
+		Topic:     "t1",
+		Key:       nil,
+		Value:     sarama.StringEncoder("asf"),
+		Headers:   nil,
+		Metadata:  nil,
+		Offset:    0,
+		Partition: 0,
+		Timestamp: time.Time{},
+	}
+	fmt.Println("发送消息")
+	err = fsq.SendMessage(message)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fsq.Consumer(context.Background())
 }

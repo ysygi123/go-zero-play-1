@@ -2,8 +2,7 @@ package main
 
 import (
 	"fmt"
-	"testplay/mq/rocketmq_i"
-	_ "testplay/mq/rocketmq_service/consumer"
+	"go-zero-play-1/common/queue/syrocketmq/rocketmq_i"
 )
 
 func main() {

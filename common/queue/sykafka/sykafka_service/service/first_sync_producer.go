@@ -80,6 +80,7 @@ func (f *Fsp) Consumer(ctx context.Context) {
 	wg.Wait()
 }
 
+//消费组
 type easy struct{}
 
 func (easy) Setup(_ sarama.ConsumerGroupSession) error   { return nil }

@@ -2,14 +2,18 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/Shopify/sarama"
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/redis"
+	"go-zero-play-1/common/happy"
 	"go-zero-play-1/common/queue/sykafka/sykafka_service/service"
 	"go-zero-play-1/common/symysql"
 	"go-zero-play-1/common/syredis"
 	user_model "go-zero-play-1/model/mysql/user-model"
+	"golang.org/x/sync/singleflight"
+	"os"
 	"strconv"
 	"sync"
 	"testing"
@@ -144,6 +148,49 @@ func Test_Redis(t *testing.T) {
 	}
 }
 
+func Benchmark_Redis(t *testing.B) {
+	cf := cache.CacheConf{}
+	cf = append(cf, cache.NodeConf{
+		RedisConf: redis.RedisConf{
+			Host: "127.0.0.1:6380",
+			Type: "cluster",
+			Pass: "",
+			Tls:  false,
+		},
+		Weight: 100,
+	})
+	cf = append(cf, cache.NodeConf{
+		RedisConf: redis.RedisConf{
+			Host: "127.0.0.1:6381",
+			Type: "cluster",
+			Pass: "",
+			Tls:  false,
+		},
+		Weight: 100,
+	})
+	cf = append(cf, cache.NodeConf{
+		RedisConf: redis.RedisConf{
+			Host: "127.0.0.1:6382",
+			Type: "cluster",
+			Pass: "",
+			Tls:  false,
+		},
+		Weight: 100,
+	})
+	syredis.InitSyRedis(cf)
+	var err error
+	for i := int64(5000000); i < 100000000; i++ {
+		_, err = syredis.GsyRedis.Zadd("test:big:range", i, strconv.Itoa(int(i)))
+		if err != nil {
+			fmt.Println(err)
+		}
+		tt := time.Now()
+		if i%10000 == 0 {
+			fmt.Println("执行了次数", i, "执行时间", time.Since(tt))
+		}
+	}
+}
+
 func Test_Select(t *testing.T) {
 	output := make(chan string, 1)
 	ttimer := time.Tick(time.Second)
@@ -187,4 +234,82 @@ func TestNewKafkaProducer(t *testing.T) {
 	}
 
 	fsq.Consumer(context.Background())
+}
+
+func Test_Mmap(t *testing.T) {
+	ggkl := &happy.LogHappy{}
+	ggkl.SetMaxSize(1024 * 1024 * 500).SetFileName("fu.log")
+	err := ggkl.InitSpace()
+	if err != nil {
+		panic(err)
+	}
+	logInfo := []byte("{\"timestamp\":\"2022-10-10 10:11:11\",\"level\":1,\"action\":\"/url/pp/cc/aa\"}\n")
+	for i := 0; i < 10000; i++ {
+		bt := logInfo
+		ggkl.MessageChan <- &bt
+	}
+	time.Sleep(10000 * time.Second)
+}
+
+func Test_normalLog(t *testing.T) {
+	files, err := os.OpenFile("fu2.log", os.O_RDWR|os.O_CREATE, 0777)
+	if err != nil {
+		panic(err)
+	}
+	logInfo := []byte("{\"timestamp\":\"2022-10-10 10:11:11\",\"level\":1,\"action\":\"/url/pp/cc/aa\"}\n")
+	bigByte := make([]byte, 0)
+	var du time.Duration
+	for i := 0; i < 10000; i++ {
+		bigByte = append(bigByte, logInfo...)
+
+	}
+	tn := time.Now()
+	_, err = files.Write(logInfo)
+	du += time.Since(tn)
+	fmt.Println("操作时间", du)
+	if err != nil {
+		panic(err)
+	}
+}
+
+var sg = singleflight.Group{}
+
+func Test_singleFilght(t *testing.T) {
+	wg := sync.WaitGroup{}
+	k := 100
+	wg.Add(k)
+	for i := 0; i < k; i++ {
+		go func() {
+			v, e := getData("igk")
+			fmt.Println(v, e)
+			wg.Done()
+		}()
+	}
+	wg.Wait()
+}
+
+var errNotExists = errors.New("not exists")
+
+func getData(key string) (value string, err error) {
+	value, err = getFromCache(key)
+	if !errors.Is(err, errNotExists) {
+		return
+	}
+	err = nil
+	vv, err, _ := sg.Do(key, func() (interface{}, error) {
+		value = getFromDb(key)
+		return value, nil
+	})
+	value, _ = vv.(string)
+	return
+}
+
+func getFromCache(key string) (value string, err error) {
+	return "", errNotExists
+}
+
+func getFromDb(key string) (value string) {
+	fmt.Println("get from db")
+	value = "123"
+	return
 }

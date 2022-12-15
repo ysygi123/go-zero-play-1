@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package yys;
+
+// protoc-gen-go 版本大于1.4.0, proto文件需要加上go_package,否则无法生成
+option go_package = "./yys";
+
+
+message BaseResponse {
+  int32 code = 1;
+}
+
+message SetYysRequest {
+  string ordersn = 1;
+
+}
+
+message CalculateInventoryReq {
+  string ordersn            = 1;
+  string default_crit_rate  = 2;
+  string default_crit_power = 3;
+}
+
+message CalculateInventoryResp {
+  repeated repeatedInventory Rst = 1;
+}
+
+message repeatedInventory {
+  repeated inventory Rst = 1;
+}
+
+message  inventory {
+  string              name            = 1;
+  int32               pos             = 2;
+  string              attr            = 3;
+  string              inventoryId     = 4;
+  string              singleAttrName  = 5;
+  double              singleAttrValue = 6;
+  repeated secondAttr secondAttr      = 7;
+}
+
+message secondAttr {
+  string name  = 1;
+  double value = 2;
+}
+
+service Yys {
+  rpc setYys(SetYysRequest) returns(BaseResponse);
+  rpc calculateInventory(CalculateInventoryReq) returns (CalculateInventoryResp);
+}

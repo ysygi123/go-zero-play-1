@@ -1,4 +1,7 @@
 type (
+	BaseReq {
+		Code int `json:"code"`
+	}
 	UserReq {
 		Id int `path:"id"`
 	}
@@ -11,6 +14,39 @@ type (
 	JwtReply {
 		Token  string `json:"token"`
 		Expire int64  `json:"expire"`
+	}
+
+	YysReq {
+		Ordersn string `json:"ordersn"`
+	}
+
+	CalculateInventoryReq {
+		Ordersn          string `json:"ordersn"`
+		DefaultCritRate  string `json:"default_crit_rate"`
+		DefaultCritPower string `json:"default_crit_power"`
+	}
+
+	CalculateInventoryResp {
+		Rst []InventoryBig `json:"rst"`
+	}
+
+	InventoryBig {
+		Rst []Inventory `json:"rst"`
+	}
+
+	Inventory {
+		Name            string       `json:"name"`
+		Pos             int          `json:"pos"`
+		Attr            string       `json:"attr"`
+		InventoryId     string       `json:"inventory_id"`
+		SecondAttr      []SecondAttr `json:"second_attr"`
+		SingleAttrValue float64      `json:"single_attr_value"`
+		SingleAttrName  string       `json:"single_attr_name"`
+	}
+
+	SecondAttr {
+		Name  string  `json:"name"`
+		Value float64 `json:"value"`
 	}
 )
 @server(
@@ -25,4 +61,11 @@ service user {
 service user {
 	@handler getJWT
 	get /api/user/jwt returns (JwtReply)
+}
+
+service user {
+	@handler setYys
+	get /api/yys/setYys (YysReq) returns (BaseReq)
+	@handler calculateInventory
+	get /api/yys/calculateInventory (CalculateInventoryReq) returns (CalculateInventoryResp)
 }

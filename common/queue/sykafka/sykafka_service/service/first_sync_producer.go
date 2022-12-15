@@ -39,7 +39,7 @@ func (f *Fsp) GetCfg() *sarama.Config {
 
 func (f *Fsp) InitProducer() error {
 	var err error
-	f.producer, err = sarama.NewSyncProducer([]string{"192.168.15.38:9092"}, f.GetCfg())
+	f.producer, err = sarama.NewSyncProducer([]string{"192.168.31.26:9092"}, f.GetCfg())
 	if err != nil {
 		return err
 	}
@@ -58,12 +58,12 @@ func (f *Fsp) SendMessages(messages []*sarama.ProducerMessage) error {
 }
 
 func (f *Fsp) GetConsumerNum() int {
-	return 5
+	return 1
 }
 
 func (f *Fsp) Consumer(ctx context.Context) {
 	fmt.Println("开始消费")
-	consumerGroup, err := sarama.NewConsumerGroup([]string{"192.168.15.38:9092"}, "gpid", f.GetCfg())
+	consumerGroup, err := sarama.NewConsumerGroup([]string{"192.168.31.26:9092"}, "gpid", f.GetCfg())
 	if err != nil {
 		return
 	}
@@ -87,9 +87,24 @@ func (easy) Setup(_ sarama.ConsumerGroupSession) error   { return nil }
 func (easy) Cleanup(_ sarama.ConsumerGroupSession) error { return nil }
 func (e easy) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
 	fmt.Println("哎嘿嘿", claim.Messages())
+	fmt.Println(claim.HighWaterMarkOffset())
+	msgs := make([]*sarama.ConsumerMessage, 2)
 	for msg := range claim.Messages() {
 		fmt.Printf("Message topic:%q partition:%d offset:%d, value:%s\n", msg.Topic, msg.Partition, msg.Offset, utils.B2S(msg.Value))
-		sess.MarkMessage(msg, "")
+		if msgs[0] == nil {
+			msgs[0] = msg
+		} else if msgs[1] == nil {
+			msgs[1] = msg
+			fmt.Println(1111111111)
+			//sess.MarkMessage(msgs[0], "")
+			//sess.Commit()
+			//sess.MarkOffset(claim.Topic(), claim.Partition(), msgs[0].Offset, "")
+			sess.MarkMessage(msgs[1], "")
+			//sess.Commit()
+		}
+
+		//sess.MarkMessage(msg, "")
+		//sess.Commit()
 	}
 	return nil
 }

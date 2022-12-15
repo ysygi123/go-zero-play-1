@@ -9,11 +9,8 @@ Mysql:
   SlaveHosts:
     - "root:1qazxsw2@tcp(127.0.0.1:3306)/scrm?charset=utf8mb4&parseTime=True&loc=Local&timeout=1000ms"
     - "root:1qazxsw2@tcp(127.0.0.1:3306)/scrm?charset=utf8mb4&parseTime=True&loc=Local&timeout=1000ms"
-
 CacheRedis:
-  - Host: 127.0.0.1:6380
-    Type: cluster
-  - Host: 127.0.0.1:6381
-    Type: cluster
-  - Host: 127.0.0.1:6382
-    Type: cluster
+  - Host: 127.0.0.1:6379
+    Type: node
+#  - Host: 127.0.0.1:6380
+#    Type: cluster

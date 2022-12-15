@@ -6,6 +6,11 @@ UserRpc:
     Hosts:
       - 127.0.0.1:2379
     Key: user.rpc
+YysRpc:
+  Etcd:
+    Hosts:
+      - 127.0.0.1:2379
+    Key: yys.rpc
 Auth:
   AccessSecret: UUIDasdfUId
   AccessExpire: 7200

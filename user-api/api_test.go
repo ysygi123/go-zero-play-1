@@ -18,6 +18,7 @@ import (
 	"sync"
 	"testing"
 	"time"
+	"unsafe"
 )
 
 func Test_apid(t *testing.T) {
@@ -106,6 +107,8 @@ func TestConsumeKafka(t *testing.T) {
 }
 
 func Test_Redis(t *testing.T) {
+	fmt.Println(time.Now().Add(-90*24*time.Hour).Format("2006-01-02") + " 00:00:00")
+	return
 	cf := cache.CacheConf{}
 	cf = append(cf, cache.NodeConf{
 		RedisConf: redis.RedisConf{
@@ -220,7 +223,7 @@ func TestNewKafkaProducer(t *testing.T) {
 	message := &sarama.ProducerMessage{
 		Topic:     "t1",
 		Key:       nil,
-		Value:     sarama.StringEncoder("asf"),
+		Value:     sarama.StringEncoder("asf21"),
 		Headers:   nil,
 		Metadata:  nil,
 		Offset:    0,
@@ -233,6 +236,11 @@ func TestNewKafkaProducer(t *testing.T) {
 		fmt.Println(err)
 	}
 
+	//fsq.Consumer(context.Background())
+}
+
+func Test_Consumer1(t *testing.T) {
+	fsq := new(service.Fsp)
 	fsq.Consumer(context.Background())
 }
 
@@ -274,7 +282,49 @@ func Test_normalLog(t *testing.T) {
 
 var sg = singleflight.Group{}
 
+type big struct {
+	A int
+	B int
+	C int
+	D int
+	E int
+}
+
+type p1 struct {
+	A int
+	B int
+}
+
+type p2 struct {
+	C int
+	D int
+	E int
+}
+
+func Test_asdf(t *testing.T) {
+	part1 := &p1{
+		A: 1,
+		B: 2,
+	}
+	part2 := &p2{
+		C: 3,
+		D: 4,
+		E: 5,
+	}
+	var a int
+	lenght := unsafe.Sizeof(a)
+	bigg := &big{}
+	pointP1 := (*p1)(unsafe.Pointer(bigg))
+	*pointP1 = *part1
+	pointP2 := (*p2)(unsafe.Pointer(uintptr(unsafe.Pointer(bigg)) + (2 * lenght)))
+	*pointP2 = *part2
+	fmt.Println(bigg, pointP1, pointP2)
+}
+
 func Test_singleFilght(t *testing.T) {
+	f, _ := strconv.ParseFloat("2.123", 64)
+	fmt.Println(f)
+	return
 	wg := sync.WaitGroup{}
 	k := 100
 	wg.Add(k)

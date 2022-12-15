@@ -1,6 +1,7 @@
 package utils
 
 import (
+	jsoniter "github.com/json-iterator/go"
 	"math/rand"
 	"reflect"
 	"time"
@@ -27,5 +28,15 @@ func S2B(s string) (b []byte) {
 	bh.Data = sh.Data
 	bh.Cap = sh.Len
 	bh.Len = sh.Len
+	return b
+}
+
+func TrueUnmarshal(b []byte, res interface{}) {
+	_ = jsoniter.Unmarshal(b, res)
+	return
+}
+
+func TrueMarshal(res interface{}) []byte {
+	b, _ := jsoniter.Marshal(res)
 	return b
 }

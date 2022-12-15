@@ -4,10 +4,11 @@ import (
 	"flag"
 	"fmt"
 	"go-zero-play-1/common/symysql"
-	"go-zero-play-1/user-rpc/internal/config"
-	"go-zero-play-1/user-rpc/internal/server"
-	"go-zero-play-1/user-rpc/internal/svc"
-	"go-zero-play-1/user-rpc/types/user"
+
+	"go-zero-play-1/yys-rpc/internal/config"
+	"go-zero-play-1/yys-rpc/internal/server"
+	"go-zero-play-1/yys-rpc/internal/svc"
+	"go-zero-play-1/yys-rpc/types/yys"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/service"
@@ -16,7 +17,7 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-var configFile = flag.String("f", "etc/user.yaml", "the config file")
+var configFile = flag.String("f", "etc/yys.yaml", "the config file")
 
 func main() {
 	flag.Parse()
@@ -24,10 +25,10 @@ func main() {
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
 	ctx := svc.NewServiceContext(c)
-	svr := server.NewUserServer(ctx)
+	svr := server.NewYysServer(ctx)
 
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
-		user.RegisterUserServer(grpcServer, svr)
+		yys.RegisterYysServer(grpcServer, svr)
 
 		if c.Mode == service.DevMode || c.Mode == service.TestMode {
 			reflection.Register(grpcServer)
@@ -38,7 +39,6 @@ func main() {
 		fmt.Println("初始化 数据库 失败 ...", err)
 		return
 	}
-	//syredis.InitSyRedis(c.Cache)
 	defer s.Stop()
 
 	fmt.Printf("Starting rpc server at %s...\n", c.ListenOn)

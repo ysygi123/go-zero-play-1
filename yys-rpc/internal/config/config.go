@@ -11,5 +11,5 @@ type Config struct {
 		MasterHost string
 		SlaveHosts []string
 	}
-	CacheRedis cache.CacheConf
+	CacheRedis cache.NodeConf
 }

@@ -1,0 +1,5 @@
+package syredis
+
+func GetBloom() {
+
+}

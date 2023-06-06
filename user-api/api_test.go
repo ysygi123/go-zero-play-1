@@ -249,7 +249,7 @@ func Test_Mmap(t *testing.T) {
 	ggkl.SetMaxSize(1024 * 1024 * 500).SetFileName("fu.log")
 	err := ggkl.InitSpace()
 	if err != nil {
-		panic(err)
+		panic((err))
 	}
 	logInfo := []byte("{\"timestamp\":\"2022-10-10 10:11:11\",\"level\":1,\"action\":\"/url/pp/cc/aa\"}\n")
 	for i := 0; i < 10000; i++ {
@@ -262,7 +262,7 @@ func Test_Mmap(t *testing.T) {
 func Test_normalLog(t *testing.T) {
 	files, err := os.OpenFile("fu2.log", os.O_RDWR|os.O_CREATE, 0777)
 	if err != nil {
-		panic(err)
+		panic((err))
 	}
 	logInfo := []byte("{\"timestamp\":\"2022-10-10 10:11:11\",\"level\":1,\"action\":\"/url/pp/cc/aa\"}\n")
 	bigByte := make([]byte, 0)
@@ -276,7 +276,7 @@ func Test_normalLog(t *testing.T) {
 	du += time.Since(tn)
 	fmt.Println("操作时间", du)
 	if err != nil {
-		panic(err)
+		panic((err))
 	}
 }
 
@@ -362,4 +362,108 @@ func getFromDb(key string) (value string) {
 	fmt.Println("get from db")
 	value = "123"
 	return
+}
+
+func Test_asdfsfff(t *testing.T) {
+	x := &sbzzk{A: 10, B: 20}
+	x2 := &sbzzk2{}
+	//dadd := unsafe.Pointer(&x.A)
+	fmt.Println(uintptr(unsafe.Pointer(x)), unsafe.Offsetof(x.A), unsafe.Offsetof(x.B), unsafe.Sizeof(int32((1))))
+	d := unsafe.Pointer(uintptr(unsafe.Pointer(x)) + unsafe.Offsetof(x.B))
+	*(*uintptr)(unsafe.Pointer(x2)) = *((*uintptr)(d))
+	fmt.Println(x2)
+}
+
+type sbzzk2 struct {
+	B int32
+}
+
+type sbzzk struct {
+	A int32
+	B int32
+}
+
+func (s *sbzzk) G() {
+
+}
+
+func TestGoDiff(t *testing.T) {
+	x := 1
+	g := 0
+	*(*uintptr)(unsafe.Pointer(&g)) = *(*uintptr)(unsafe.Pointer(&x))
+	fmt.Println(g, x)
+}
+
+type ErrObject struct {
+	err       error
+	taskIndex int
+}
+
+type Job struct {
+	taskIdx int
+	f       func() (result interface{}, err error)
+}
+
+func (j *Job) SetTaskIdx(idx int) {
+	j.taskIdx = idx
+}
+
+func (j *Job) GetTaskIdx() int {
+	return j.taskIdx
+}
+
+type GoFuncTask struct {
+	taskNum           int
+	residueTaskNum    int
+	queueSize         int
+	nowTaskInx        int
+	finishMissionFlag int64
+	taskQueue         chan *Job
+	errs              []*ErrObject
+	errChan           chan *ErrObject
+}
+
+func NewGoFuncTask(goFuncNum int, queueSize int, taskNum int) *GoFuncTask {
+	g := &GoFuncTask{
+		taskNum:        taskNum,
+		residueTaskNum: taskNum,
+		queueSize:      queueSize,
+		taskQueue:      make(chan *Job, queueSize),
+		errs:           make([]*ErrObject, 0),
+	}
+	g.initErrChan()
+	g.init(goFuncNum)
+	return g
+}
+
+func (g *GoFuncTask) initErrChan() {
+	go func() {
+		for {
+			ejb, ok := <-g.errChan
+			if !ok {
+				break
+			}
+			g.errs = append(g.errs, ejb)
+		}
+	}()
+}
+
+func (g *GoFuncTask) init(goFuncNum int) {
+	for i := 0; i < goFuncNum; i++ {
+		go func() {
+			for {
+				x, ok := <-g.taskQueue
+				if !ok {
+					break
+				}
+				_, err := x.f()
+				if err != nil {
+					g.errChan <- &ErrObject{
+						err:       err,
+						taskIndex: x.GetTaskIdx(),
+					}
+				}
+			}
+		}()
+	}
 }

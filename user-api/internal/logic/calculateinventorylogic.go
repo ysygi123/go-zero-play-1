@@ -2,10 +2,10 @@ package logic
 
 import (
 	"context"
-	"go-zero-play-1/yys-rpc/types/yys"
-
 	"go-zero-play-1/user-api/internal/svc"
 	"go-zero-play-1/user-api/internal/types"
+	"go-zero-play-1/yys-rpc/types/yys"
+	"golang.org/x/sync/singleflight"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -23,6 +23,8 @@ func NewCalculateInventoryLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 		svcCtx: svcCtx,
 	}
 }
+
+var ordersnSingleFlight singleflight.Group
 
 func (l *CalculateInventoryLogic) CalculateInventory(req *types.CalculateInventoryReq) (resp *types.CalculateInventoryResp, err error) {
 	res, err := l.svcCtx.YysRpc.CalculateInventory(l.ctx, &yys.CalculateInventoryReq{

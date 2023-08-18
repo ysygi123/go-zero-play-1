@@ -32,7 +32,6 @@ func (f *Fsp) GetCfg() *sarama.Config {
 	cfg.Producer.Partitioner = sarama.NewRandomPartitioner //随机分配分区 partition
 	cfg.Producer.Return.Successes = true
 	cfg.Producer.Interceptors = []sarama.ProducerInterceptor{}
-
 	cfg.Consumer.Offsets.Initial = sarama.OffsetOldest
 	return cfg
 }
@@ -80,7 +79,7 @@ func (f *Fsp) Consumer(ctx context.Context) {
 	wg.Wait()
 }
 
-//消费组
+// 消费组
 type easy struct{}
 
 func (easy) Setup(_ sarama.ConsumerGroupSession) error   { return nil }
@@ -97,7 +96,7 @@ func (e easy) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sarama.Consum
 			msgs[1] = msg
 			fmt.Println(1111111111)
 			//sess.MarkMessage(msgs[0], "")
-			//sess.Commit()
+			sess.Commit()
 			//sess.MarkOffset(claim.Topic(), claim.Partition(), msgs[0].Offset, "")
 			sess.MarkMessage(msgs[1], "")
 			//sess.Commit()

@@ -44,6 +44,7 @@ func Fk(firstNum int, nums []int, diffMap *map[string]struct{}, allNum *[][]int)
 		newArr := append((*allNum)[i], firstNum)
 		(*diffMap)[newKey] = struct{}{}
 		*allNum = append(*allNum, newArr)
+		fmt.Println("before insert", firstNum, (*allNum)[i])
 		fmt.Println("for all num", *allNum)
 	}
 	a := []int{firstNum}

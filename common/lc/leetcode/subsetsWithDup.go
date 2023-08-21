@@ -18,41 +18,43 @@ func SubsetsWithDup(nums []int) [][]int {
 	})
 	d := make(map[string]struct{})
 	n := [][]int{}
-	Fk(nums[0], nums[1:], &d, &n)
+	n = Fk(nums[0], nums[1:], &d)
 	n = append(n, []int{})
 	return n
 }
 
-func Fk(firstNum int, nums []int, diffMap *map[string]struct{}, allNum *[][]int) {
+func Fk(firstNum int, nums []int, diffMap *map[string]struct{}) (allNum [][]int) {
 	fmt.Println("fn", firstNum, "arr", nums, "diff", diffMap, "arrM")
 	if len(nums) == 0 {
 		a := []int{firstNum}
 		(*diffMap)[getKey(a)] = struct{}{}
-		*allNum = append(*allNum, a)
-		fmt.Println("len0", *allNum)
+		allNum = append(allNum, a)
+		//fmt.Println("len0", allNum)
 		return
 	}
-	Fk(nums[0], nums[1:], diffMap, allNum)
-	lN := len(*allNum)
+	allNum = Fk(nums[0], nums[1:], diffMap)
+	lN := len(allNum)
 	for i := 0; i < lN; i++ {
-		lastK := getKey((*allNum)[i])
+		lastK := getKey(allNum[i])
 		newKey := lastK + "-" + strconv.Itoa(firstNum)
 		_, ok := (*diffMap)[newKey]
 		if ok {
 			continue
 		}
-		newArr := append((*allNum)[i], firstNum)
+		x := make([]int, len(allNum[i]))
+		copy(x, allNum[i])
+		newArr := append(x, firstNum)
 		(*diffMap)[newKey] = struct{}{}
-		*allNum = append(*allNum, newArr)
-		fmt.Println("before insert", firstNum, (*allNum)[i])
-		fmt.Println("for all num", *allNum)
+		allNum = append(allNum, newArr)
+		//fmt.Println("before insert", firstNum, allNum[i])
+		//fmt.Println("for all num", allNum)
 	}
 	a := []int{firstNum}
 	k := getKey(a)
 	if _, ok := (*diffMap)[k]; !ok {
 		(*diffMap)[k] = struct{}{}
-		*allNum = append(*allNum, a)
-		fmt.Println("last all num", *allNum)
+		allNum = append(allNum, a)
+		//fmt.Println("last all num", allNum)
 	}
 	return
 }

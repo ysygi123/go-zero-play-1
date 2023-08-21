@@ -8,7 +8,6 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/go-vgo/robotgo v0.100.10
 	github.com/golang-jwt/jwt/v4 v4.4.2
-	github.com/golang/mock v1.6.0
 	github.com/json-iterator/go v1.1.12
 	github.com/stretchr/testify v1.8.1 // indirect
 	github.com/zeromicro/go-zero v1.3.5

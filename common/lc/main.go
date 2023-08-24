@@ -1,7 +1,10 @@
 package main
 
-import "go-zero-play-1/common/lc/leetcode"
+import (
+	"fmt"
+	"go-zero-play-1/common/lc/leetcode"
+)
 
 func main() {
-	leetcode.RestoreIpAddresses("123456")
+	fmt.Println(leetcode.RestoreIpAddresses("101023"))
 }
